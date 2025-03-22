@@ -1,0 +1,11 @@
+*.exe
+*.exe~
+*.out
+*.test
+
+*.so
+*.dylib
+*.dll
+
+*.log
+*.env
