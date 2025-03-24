@@ -1,4 +1,4 @@
-package repositorweb2
+package repositoryweb2
 
 import (
 	entitiesweb2 "backend/internal/domain/entities/web2"

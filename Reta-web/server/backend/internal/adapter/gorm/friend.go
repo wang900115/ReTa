@@ -14,6 +14,7 @@ type Friend struct {
 	FriendFullname string `gorm:"column:friend_full_name;not null;type:varchar(100)" json:"friend_full_name"`
 	FriendNickname string `gorm:"column:friend_nick_name;not null;type:varchar(100)" json:"friend_nick_name"`
 	FriendStatus   string `gorm:"column:friend_status;not null;type:varchar(20)" json:"friend_status"`
+	FriendBanned   bool   `gorm:"column:friend_banned;not null;default:false;type:tinyint(1)" json:"friend_banned"`
 
 	CreatedAt *time.Time     `gorm:"column:created_at;type:datetime" json:"created_at"`
 	UpdatedAt *time.Time     `gorm:"column:updated_at;type:datetime" json:"updated_at,omitempty"`
@@ -31,6 +32,7 @@ func (f Friend) ToDomain() entitiesweb2.Friend {
 		FriendFullname: f.FriendFullname,
 		FriendNickname: f.FriendNickname,
 		FriendStatus:   f.FriendStatus,
+		FriendBanned:   f.FriendBanned,
 	}
 }
 
@@ -41,5 +43,6 @@ func (f Friend) FromDomain(friend entitiesweb2.Friend) Friend {
 		FriendFullname: friend.FriendFullname,
 		FriendNickname: friend.FriendNickname,
 		FriendStatus:   friend.FriendStatus,
+		FriendBanned:   f.FriendBanned,
 	}
 }

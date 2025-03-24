@@ -6,20 +6,15 @@ type IUserRepository interface {
 	CreateUser(entitiesweb2.User) (entitiesweb2.User, error)
 	DeleteUser(entitiesweb2.User) (entitiesweb2.User, error)
 	UpdateUser(entitiesweb2.User) (entitiesweb2.User, error)
-
-	CreateUserByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
-	DeleteUserByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
-	UpdateUserByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
 }
 
 type IUserWithAuthorityRepository interface {
-	CreateAuthorityByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
-	DeleteAuthorityByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
-	UpdateAuthorityByManager(entitiesweb2.UserWithAuthority) (entitiesweb2.UserWithAuthority, error)
+	CreateAuthorityByManager(entitiesweb2.UserWithAuthority, entitiesweb2.Authority) (entitiesweb2.UserWithAuthority, error)
+	DeleteAuthorityByManager(entitiesweb2.UserWithAuthority, entitiesweb2.Authority) (entitiesweb2.UserWithAuthority, error)
 }
 
 type IUserWithFriendRepository interface {
-	CreateFriendByManager(entitiesweb2.UserWithFriend) (entitiesweb2.UserWithFriend, error)
-	DeleteFriendByManager(entitiesweb2.UserWithFriend) (entitiesweb2.UserWithFriend, error)
-	UpdateFriendByManager(entitiesweb2.UserWithFriend) (entitiesweb2.UserWithFriend, error)
+	CreateFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
+	DeleteFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
+	UpdateFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
 }

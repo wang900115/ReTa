@@ -6,4 +6,5 @@ type Friend struct {
 	FriendFullname string `json:"friend_fullname"`
 	FriendNickname string `json:"friend_nickname"`
 	FriendStatus   string `json:"friend_status"`
+	FriendBanned   bool   `json:"friend_banned"`
 }

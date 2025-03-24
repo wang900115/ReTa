@@ -61,14 +61,14 @@ func (u User) FromDomain(user entitiesweb2.User) User {
 
 // 使用者加上權限管理
 type UserWithAuthority struct {
-	User User
-
+	User
 	Authorities []Authority `gorm:"many2many:user_authority;foreignKey:UUID;joinForeignKey:user_uuid;References:UUID;JoinReferences:authority_uuid" json:"authorities"`
 }
 
 func (UserWithAuthority) TableName() string {
-	return "user"
+	return "user_authority"
 }
+
 func (ua UserWithAuthority) ToDomain() entitiesweb2.UserWithAuthority {
 	authorities := make([]entitiesweb2.Authority, len(ua.Authorities))
 	for i, a := range ua.Authorities {
@@ -97,7 +97,7 @@ type UserWithFriend struct {
 }
 
 func (UserWithFriend) TableName() string {
-	return "user"
+	return "user_friend"
 }
 func (uf UserWithFriend) ToDomain() entitiesweb2.UserWithFriend {
 	friends := make([]entitiesweb2.Friend, len(uf.Friends))
