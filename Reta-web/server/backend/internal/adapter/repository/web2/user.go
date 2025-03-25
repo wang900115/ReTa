@@ -64,13 +64,13 @@ func NewUserAuthorityRepository(gorm *gorm.DB) irepositoryweb2.IUserWithAuthorit
 
 // 使用者附加權限管理儲存庫方法: 新增權限
 func (ua *UserAuthorityRepository) CreateAuthorityByManager(manager entitiesweb2.UserWithAuthority, authority entitiesweb2.Authority) (entitiesweb2.UserWithAuthority, error) {
-	// 檢查管理者存不存在
+	//! 檢查管理者存不存在
 	var userModel model.User
 	if err := ua.gorm.First(&userModel, "uuid = ?", manager.UUID).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
-	// 檢查權限存不存在
+	//! 檢查權限存不存在
 	var authModel model.Authority
 	if err := ua.gorm.Fist(&authModel, "uuid = ?", authority.UUID).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
@@ -78,7 +78,7 @@ func (ua *UserAuthorityRepository) CreateAuthorityByManager(manager entitiesweb2
 
 	//判斷就有該權限
 	var exists int64
-	if err := ua.gorm.Table("user_authority").Where("user_uuid = ? AND authority_uuid = ?", userModel.UUID, authModel.UUID).Count(&exists).Error; err | (exists > 0) {
+	if err := ua.gorm.Table("user_authority").Where("user_uuid = ? AND authority_uuid = ?", userModel.UUID, authModel.UUID).Count(&exists).Error; err != nil || (exists > 0) {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
@@ -109,13 +109,13 @@ func (ua *UserAuthorityRepository) CreateAuthorityByManager(manager entitiesweb2
 
 // 使用者附加權限管理儲存庫方法: 刪除權限
 func (ua *UserAuthorityRepository) DeleteAuthorityByManager(manager entitiesweb2.UserWithAuthority, authority entitiesweb2.Authority) (entitiesweb2.UserWithAuthority, error) {
-	// 檢查管理者存不存在
+	//! 檢查管理者存不存在
 	var userModel model.User
 	if err := ua.gorm.First(&userModel, "uuid = ?", manager.UUID).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
-	// 檢查權限存不存在
+	//! 檢查權限存不存在
 	var authModel model.Authority
 	if err := ua.gorm.Fist(&authModel, "uuid = ?", authority.UUID).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
@@ -123,18 +123,18 @@ func (ua *UserAuthorityRepository) DeleteAuthorityByManager(manager entitiesweb2
 
 	// 判斷本來就沒有權限
 	var exists int64
-	if err := ua.gorm.Table("user_authority").Where("user_uuid = ? AND authority_uuid = ?", userModel.UUID, authModel.UUID).Count(&exists).Error; err|(exists) == 0 {
+	if err := ua.gorm.Table("user_authority").Where("user_uuid = ? AND authority_uuid = ?", userModel.UUID, authModel.UUID).Count(&exists).Error; err != nil || (exists == 0) {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
 	// 從原有權限陣列中移除關聯
-	if err := ua.gorm.Model(&userModel).Association("Authorities").Delete(&authModel); err != nil {
+	if err := ua.gorm.Model(&userModel).Association("Authorities").Delete(&authModel).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
 	// 查詢該使用者刪除後的所有權限
 	var authoritiesModel []model.Authority
-	if err := ua.gorm.Table("user_authority").Joins("JOIN authority ON authority.UUID = user_authority.authority_uuid").Where("user_authority.user_uuid = ?", userModel.UUID).FIND(&authoritiesModel).Error; err != nil {
+	if err := ua.gorm.Table("user_authority").Joins("JOIN authority ON authority.UUID = user_authority.authority_uuid").Where("user_authority.user_uuid = ?", userModel.UUID).Find(&authoritiesModel).Error; err != nil {
 		return entitiesweb2.UserWithAuthority{}, err
 	}
 
@@ -148,28 +148,128 @@ func (ua *UserAuthorityRepository) DeleteAuthorityByManager(manager entitiesweb2
 }
 
 // 使用者附加好友關係儲存庫結構
-type UserWithFriendRepository struct {
+type UserFriendRepository struct {
 	gorm *gorm.DB
 }
 
 // 新建使用者附加好友關係儲存庫
-func NewUserWihFriendRepository(gorm *gorm.DB) irepositoryweb2.IUserWithFriendRepository {
-	return &UserWithFriendRepository{
+func NewUserFriendRepository(gorm *gorm.DB) irepositoryweb2.IUserWithFriendRepository {
+	return &UserFriendRepository{
 		gorm: gorm,
 	}
 }
 
 // 使用者附加好友關係儲存庫方法: 新增朋友
-func (uf *UserWithFriendRepository) CreateFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+func (uf *UserFriendRepository) CreateFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+	//!檢查使用者存不存在
+	var userModel model.User
+	if err := uf.gorm.First(&userModel, "uuid = ?", self.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+	//!檢查朋友存不存在
+	var friendModel model.Friend
+	if err := uf.gorm.First(&friendModel, "uuid = ?", friend.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	// 判斷就有該好友
+	var exists int64
+	if err := uf.gorm.Table("user_friend").Where("user_uuid = ? AND friend_uuid = ?", userModel.UUID, friendModel.UUID).Count(&exists).Error; err != nil || (exists > 0) {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	// 在原有好友關聯中新增關聯
+	if err := uf.gorm.Model(&userModel).Association("Friends").Append(&friendModel); err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	// 查詢該使用者新稱後的所有好友
+	var friendsModel []model.Friend
+	if err := uf.gorm.Table("user_friend").Join("JOIN friend ON friend.UUID = user_friend.friend_uuid").Where("user_friend.user_uuid = ?", userModel.UUID).Find(&friendsModel).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	userFriend := model.UserWithFriend{
+		User:    userModel,
+		Friends: friendsModel,
+	}
+	return userFriend.ToDomain(), nil
 
 }
 
 // 使用者附加好友關係儲存庫方法: 刪除朋友
-func (uf *UserWithFriendRepository) DeleteFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+func (uf *UserFriendRepository) DeleteFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+	//! 檢查使用者存不存在
+	var userModel model.User
+	if err := uf.gorm.First(&userModel, "uuid = ?", self.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+	//! 檢查朋友存不存在
+	var friendModel model.Friend
+	if err := uf.gorm.First(&friendModel, "uuid = ?", friend.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
 
+	// 判斷本來就沒有該好友
+	var exists int64
+	if err := uf.gorm.Table("user_friend").Where("user_uuid = ? AND friend_uuid = ?", userModel.UUID, friend.UUID).Count(&exists).Error; err != nil || (exists == 0) {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	// 從原有好友陣列中移除關聯
+	if err := uf.gorm.Model(&userModel).Association("Friends").Delete(&friendModel).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	// 查詢該使用者刪除後的所有好友
+	var friendsModel []model.Friend
+	if err := uf.gorm.Table("user_friend").Join("JOIN friend ON friend.UUID = user_friend.friend_uuid").Where("user_friend.user_uuid = ?", userModel.UUID).Find(&friendsModel).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	userFriend := model.UserWithFriend{
+		User:    userModel,
+		Friends: friendsModel,
+	}
+	return userFriend.ToDomain(), nil
 }
 
 // 使用者附加好友關係儲存庫方法: 更新朋友
-func (uf *UserWithFriendRepository) UpdateFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+func (uf *UserFriendRepository) UpdateFriendBySelf(self entitiesweb2.UserWithFriend, friend entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error) {
+	//! 檢查使用者存不存在
+	var userModel model.User
+	if err := uf.gorm.First(&userModel, "uuid = ?", self.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+	//! 檢查朋友存不存在
+	var friendModel model.Friend
+	if err := uf.gorm.First(&friendModel, "uuid = ?", friend.UUID).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+	// 判斷該使用者有該好友
+	var exists int64
+	if err := uf.gorm.Table("user_friend").Where("user_uuid = ? AND friend_uuid = ?", userModel.UUID, friend.UUID).Count(&exists).Error; err != nil || (exists == 0) {
+		return entitiesweb2.UserWithFriend{}, err
+	}
 
+	// 更新model 並保存
+	friendModel.Username = friend.Username
+	friendModel.Fullname = friend.Fullname
+	friendModel.Nickname = friend.Nickname
+	friendModel.Status = friend.Status
+	friendModel.Banned = friend.Banned
+	if err := uf.gorm.Save(&friendModel).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	var friendsModel []model.Friend
+	if err := uf.gorm.Table("user_friend").Join("JOIN friend ON friend.UUID = user_friend.friend_uuid").Where("user_friend.user_uuid = ?", userModel.UUID).Find(&friendsModel).Error; err != nil {
+		return entitiesweb2.UserWithFriend{}, err
+	}
+
+	userFriend := model.UserWithFriend{
+		User:    userModel,
+		Friends: friendsModel,
+	}
+	return userFriend.ToDomain(), nil
 }

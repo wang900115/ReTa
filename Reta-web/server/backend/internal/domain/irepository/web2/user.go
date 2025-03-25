@@ -14,7 +14,7 @@ type IUserWithAuthorityRepository interface {
 }
 
 type IUserWithFriendRepository interface {
-	CreateFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
-	DeleteFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
-	UpdateFriendByManager(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
+	CreateFriendBySelf(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
+	DeleteFriendBySelf(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
+	UpdateFriendBySelf(entitiesweb2.UserWithFriend, entitiesweb2.Friend) (entitiesweb2.UserWithFriend, error)
 }

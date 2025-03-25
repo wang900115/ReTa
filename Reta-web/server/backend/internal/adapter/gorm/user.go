@@ -93,7 +93,7 @@ func (ua UserWithAuthority) FromDomain(userwithauthority entitiesweb2.UserWithAu
 // 使用者加上好友關係
 type UserWithFriend struct {
 	User
-	Friends []Friend `gorm:"many2many:user_friend;foreignKey:UUID;joinForeignKey:user_uuid;References:FriendUUID;JoinReferences:friend_uuid" json:"friends"`
+	Friends []Friend `gorm:"many2many:user_friend;foreignKey:UUID;joinForeignKey:user_uuid;References:UUID;JoinReferences:friend_uuid" json:"friends"`
 }
 
 func (UserWithFriend) TableName() string {
