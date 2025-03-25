@@ -9,3 +9,6 @@
 
 *.log
 *.env
+
+*.mod
+*.sum
