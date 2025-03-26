@@ -1,7 +1,7 @@
 package model
 
 import (
-	entitiesweb2 "backend/internal/domain/entities/web2"
+	entities "backend/internal/domain/entities"
 	"time"
 
 	"gorm.io/gorm"
@@ -28,8 +28,8 @@ type User struct {
 func (User) TableName() string {
 	return "user"
 }
-func (u User) ToDomain() entitiesweb2.User {
-	return entitiesweb2.User{
+func (u User) ToDomain() entities.User {
+	return entities.User{
 		UUID:     u.UUID,
 		IsEnable: u.IsEnable,
 		Username: u.Username,
@@ -43,7 +43,7 @@ func (u User) ToDomain() entitiesweb2.User {
 		Description: u.Description,
 	}
 }
-func (u User) FromDomain(user entitiesweb2.User) User {
+func (u User) FromDomain(user entities.User) User {
 	return User{
 		UUID:     user.UUID,
 		IsEnable: user.IsEnable,
@@ -69,17 +69,17 @@ func (UserWithAuthority) TableName() string {
 	return "user_authority"
 }
 
-func (ua UserWithAuthority) ToDomain() entitiesweb2.UserWithAuthority {
-	authorities := make([]entitiesweb2.Authority, len(ua.Authorities))
+func (ua UserWithAuthority) ToDomain() entities.UserWithAuthority {
+	authorities := make([]entities.Authority, len(ua.Authorities))
 	for i, a := range ua.Authorities {
 		authorities[i] = a.ToDomain()
 	}
-	return entitiesweb2.UserWithAuthority{
+	return entities.UserWithAuthority{
 		User:        ua.User.ToDomain(),
 		Authorities: authorities,
 	}
 }
-func (ua UserWithAuthority) FromDomain(userwithauthority entitiesweb2.UserWithAuthority) UserWithAuthority {
+func (ua UserWithAuthority) FromDomain(userwithauthority entities.UserWithAuthority) UserWithAuthority {
 	authorities := make([]Authority, len(userwithauthority.Authorities))
 	for i, a := range userwithauthority.Authorities {
 		authorities[i] = Authority{}.FromDomain(a)
@@ -99,18 +99,18 @@ type UserWithFriend struct {
 func (UserWithFriend) TableName() string {
 	return "user_friend"
 }
-func (uf UserWithFriend) ToDomain() entitiesweb2.UserWithFriend {
-	friends := make([]entitiesweb2.Friend, len(uf.Friends))
+func (uf UserWithFriend) ToDomain() entities.UserWithFriend {
+	friends := make([]entities.Friend, len(uf.Friends))
 	for i, a := range uf.Friends {
 		friends[i] = a.ToDomain()
 	}
-	return entitiesweb2.UserWithFriend{
+	return entities.UserWithFriend{
 		User:    uf.User.ToDomain(),
 		Friends: friends,
 		Total:   len(uf.Friends),
 	}
 }
-func (uf UserWithFriend) FromDomain(userwithfriend entitiesweb2.UserWithFriend) UserWithFriend {
+func (uf UserWithFriend) FromDomain(userwithfriend entities.UserWithFriend) UserWithFriend {
 	friends := make([]Friend, len(userwithfriend.Friends))
 	for i, a := range userwithfriend.Friends {
 		friends[i] = Friend{}.FromDomain(a)

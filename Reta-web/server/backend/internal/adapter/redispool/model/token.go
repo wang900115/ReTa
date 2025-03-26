@@ -1,7 +1,7 @@
 package model
 
 import (
-	entitiesweb2 "backend/internal/domain/entities/web2"
+	entities "backend/internal/domain/entities"
 )
 
 type TokenClaims struct {
@@ -11,8 +11,8 @@ type TokenClaims struct {
 	Nickname string `json:"nick_name"`
 }
 
-func (tc TokenClaims) ToDomain() entitiesweb2.TokenClaims {
-	return entitiesweb2.TokenClaims{
+func (tc TokenClaims) ToDomain() entities.TokenClaims {
+	return entities.TokenClaims{
 		UserUUID: tc.UserUUID,
 		Username: tc.Username,
 		Fullname: tc.Fullname,
@@ -20,7 +20,7 @@ func (tc TokenClaims) ToDomain() entitiesweb2.TokenClaims {
 	}
 }
 
-func (tc TokenClaims) FromDomain(tokenClaims entitiesweb2.TokenClaims) TokenClaims {
+func (tc TokenClaims) FromDomain(tokenClaims entities.TokenClaims) TokenClaims {
 	return TokenClaims{
 		UserUUID: tokenClaims.UserUUID,
 		Username: tokenClaims.Username,

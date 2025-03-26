@@ -1,4 +1,4 @@
-package entitiesweb2
+package entities
 
 type Friend struct {
 	UUID     string `json:"uuid"`

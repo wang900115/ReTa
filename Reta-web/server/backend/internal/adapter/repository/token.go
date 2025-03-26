@@ -1,8 +1,8 @@
-package repositoryweb2
+package repository
 
 import (
-	entitiesweb2 "backend/internal/domain/entities/web2"
-	irepositoryweb2 "backend/internal/domain/irepository/web2"
+	entities "backend/internal/domain/entities"
+	irepository "backend/internal/domain/irepository"
 	"crypto/rand"
 
 	"github.com/redis/go-redis/v9"
@@ -17,7 +17,7 @@ type TokenRepository struct {
 	redis *redis.Client
 }
 
-func NewTokenRepository(redis *redis.Client) irepositoryweb2.ITokenRepository {
+func NewTokenRepository(redis *redis.Client) irepository.ITokenRepository {
 	return &TokenRepository{
 		redis: redis,
 	}
@@ -36,11 +36,11 @@ func (TokenRepository) generateRandomSalt(saltSize int) []byte {
 	return salt
 }
 
-func (t *TokenRepository) Generate(TokenClaims entitiesweb2.TokenClaims) (string, error) {
+func (t *TokenRepository) Generate(TokenClaims entities.TokenClaims) (string, error) {
 
 }
 
-func (t *TokenRepository) Verify(token string) (entitiesweb2.TokenClaims, error) {
+func (t *TokenRepository) Verify(token string) (entities.TokenClaims, error) {
 
 }
 

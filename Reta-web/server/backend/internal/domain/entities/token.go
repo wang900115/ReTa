@@ -1,4 +1,4 @@
-package entitiesweb2
+package entities
 
 type TokenClaims struct {
 	UserUUID string `json:"user_uuid"`

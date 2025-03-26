@@ -1,4 +1,4 @@
-package entitiesweb2
+package entities
 
 type Authority struct {
 	UUID        string `json:"uuid"`

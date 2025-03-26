@@ -1,7 +1,7 @@
 package model
 
 import (
-	entitiesweb2 "backend/internal/domain/entities/web2"
+	entities "backend/internal/domain/entities"
 	"time"
 
 	"gorm.io/gorm"
@@ -25,8 +25,8 @@ func (Friend) TableName() string {
 	return "friend"
 }
 
-func (f Friend) ToDomain() entitiesweb2.Friend {
-	return entitiesweb2.Friend{
+func (f Friend) ToDomain() entities.Friend {
+	return entities.Friend{
 		UUID:     f.UUID,
 		Username: f.Username,
 		Fullname: f.Fullname,
@@ -36,7 +36,7 @@ func (f Friend) ToDomain() entitiesweb2.Friend {
 	}
 }
 
-func (f Friend) FromDomain(friend entitiesweb2.Friend) Friend {
+func (f Friend) FromDomain(friend entities.Friend) Friend {
 	return Friend{
 		UUID:     friend.UUID,
 		Username: friend.Username,

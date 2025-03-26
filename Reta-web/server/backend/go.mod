@@ -5,7 +5,6 @@ go 1.24.0
 require (
 	github.com/allegro/bigcache/v3 v3.1.0
 	github.com/goccy/go-json v0.10.5
-	github.com/golang-jwt/jwt/v4 v4.5.2
 	github.com/redis/go-redis/v9 v9.7.3
 	github.com/spf13/viper v1.20.0
 	github.com/syndtr/goleveldb v1.0.0
