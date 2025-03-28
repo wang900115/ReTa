@@ -24,3 +24,14 @@ type UserWithFriend struct {
 	Friends []Friend `json:"friends"`
 	Total   int      `json:"total"`
 }
+
+type UserWithChannel struct {
+	User
+	Channels []Channel `json:"channels"`
+}
+
+type UserWithPost struct {
+	User
+	Posts []Post `json:"posts"`
+	Total int    `json:"total"`
+}

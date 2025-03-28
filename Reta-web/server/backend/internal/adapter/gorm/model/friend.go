@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 朋友關係
+// 朋友
 type Friend struct {
 	UUID     string `gorm:"column:uuid;not null;unique;type:varchar(128)" json:"uuid"`
 	Username string `gorm:"column:username;type:varchar(128)" json:"username"`

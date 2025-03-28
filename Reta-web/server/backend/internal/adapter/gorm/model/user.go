@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// 使用者
 type User struct {
 	UUID        string `gorm:"column:uuid;primary_key;type:char(36)"`
 	IsEnable    bool   `gorm:"column:is_enable;not null;default:true;type:tinyint(1)" json:"is_enable"`
@@ -28,6 +27,7 @@ type User struct {
 func (User) TableName() string {
 	return "user"
 }
+
 func (u User) ToDomain() entities.User {
 	return entities.User{
 		UUID:     u.UUID,
@@ -43,6 +43,7 @@ func (u User) ToDomain() entities.User {
 		Description: u.Description,
 	}
 }
+
 func (u User) FromDomain(user entities.User) User {
 	return User{
 		UUID:     user.UUID,
@@ -59,7 +60,6 @@ func (u User) FromDomain(user entities.User) User {
 	}
 }
 
-// 使用者加上權限管理
 type UserWithAuthority struct {
 	User
 	Authorities []Authority `gorm:"many2many:user_authority;foreignKey:UUID;joinForeignKey:user_uuid;References:UUID;JoinReferences:authority_uuid" json:"authorities"`
@@ -79,6 +79,7 @@ func (ua UserWithAuthority) ToDomain() entities.UserWithAuthority {
 		Authorities: authorities,
 	}
 }
+
 func (ua UserWithAuthority) FromDomain(userwithauthority entities.UserWithAuthority) UserWithAuthority {
 	authorities := make([]Authority, len(userwithauthority.Authorities))
 	for i, a := range userwithauthority.Authorities {
@@ -90,7 +91,6 @@ func (ua UserWithAuthority) FromDomain(userwithauthority entities.UserWithAuthor
 	}
 }
 
-// 使用者加上好友關係
 type UserWithFriend struct {
 	User
 	Friends []Friend `gorm:"many2many:user_friend;foreignKey:UUID;joinForeignKey:user_uuid;References:UUID;JoinReferences:friend_uuid" json:"friends"`
@@ -118,5 +118,67 @@ func (uf UserWithFriend) FromDomain(userwithfriend entities.UserWithFriend) User
 	return UserWithFriend{
 		User:    User{}.FromDomain(userwithfriend.User),
 		Friends: friends,
+	}
+}
+
+type UserWithChannel struct {
+	User
+	Channels []Channel `gorm:"many2many:user_channel;foreignKey:UUID;joinForeignKey:user_uuid;Reference:UUID;JoinReferences:channel_uuid" json:"channels"`
+}
+
+func (UserWithChannel) TableName() string {
+	return "user_channel"
+}
+
+func (uc UserWithChannel) ToDomain() entities.UserWithChannel {
+	channels := make([]entities.Channel, len(uc.Channels))
+	for i, a := range uc.Channels {
+		channels[i] = a.ToDomain()
+	}
+	return entities.UserWithChannel{
+		User:     uc.User.ToDomain(),
+		Channels: channels,
+	}
+}
+
+func (uc UserWithChannel) FromDomain(userwithchannel entities.UserWithChannel) UserWithChannel {
+	channels := make([]Channel, len(userwithchannel.Channels))
+	for i, a := range userwithchannel.Channels {
+		channels[i] = Channel{}.FromDomain(a)
+	}
+	return UserWithChannel{
+		User:     User{}.FromDomain(userwithchannel.User),
+		Channels: channels,
+	}
+}
+
+type UserWithPost struct {
+	User
+	Posts []Post `gorm:"many2many: user_post;foreignKey:UUID;joinForeignKey:user_uuid;Reference:Author;JoinReferences:post_uuid" json:"posts"`
+}
+
+func (UserWithPost) TableName() string {
+	return "user_post"
+}
+
+func (up UserWithPost) ToDomain() entities.UserWithPost {
+	posts := make([]entities.Post, len(up.Posts))
+	for i, a := range up.Posts {
+		posts[i] = a.ToDomain()
+	}
+	return entities.UserWithPost{
+		User:  up.User.ToDomain(),
+		Posts: posts,
+	}
+}
+
+func (up UserWithPost) FromDomain(userwithpost entities.UserWithPost) UserWithPost {
+	posts := make([]Post, len(userwithpost.Posts))
+	for i, a := range userwithpost.Posts {
+		posts[i] = Post{}.FromDomain(a)
+	}
+	return UserWithPost{
+		User:  User{}.FromDomain(userwithpost.User),
+		Posts: posts,
 	}
 }
