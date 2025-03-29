@@ -7,6 +7,8 @@ import (
 type Post struct {
 	UUID         string    `json:"uuid"`
 	Author       string    `json:"author"`
+	Content      string    `json:"content"`
+	MediaURL     []string  `json:"media_urls"`
 	Likes        int       `json:"likes"`
 	CommentUUID  []string  `json:"comment_uuid"`
 	CommentCount int       `json:"comment_count"`

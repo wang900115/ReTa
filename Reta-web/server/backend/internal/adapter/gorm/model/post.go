@@ -8,6 +8,8 @@ import (
 type Post struct {
 	UUID         string   `json:"uuid"`
 	Author       string   `json:"author"`
+	Content      string   `json:"content"`
+	MediaURL     []string `json:"media_urls"`
 	Likes        int      `json:"likes"`
 	CommentUUID  []string `json:"comment_uuid"`
 	CommentCount int      `json:"comment_count"`
@@ -24,6 +26,8 @@ func (p Post) ToDomain() entities.Post {
 	return entities.Post{
 		UUID:         p.UUID,
 		Author:       p.Author,
+		Content:      p.Content,
+		MediaURL:     p.MediaURL,
 		Likes:        p.Likes,
 		CommentUUID:  p.CommentUUID,
 		CommentCount: p.CommentCount,
@@ -36,6 +40,8 @@ func (p Post) FromDomain(post entities.Post) Post {
 	return Post{
 		UUID:         post.UUID,
 		Author:       post.Author,
+		Content:      post.Content,
+		MediaURL:     post.MediaURL,
 		Likes:        post.Likes,
 		CommentUUID:  post.CommentUUID,
 		CommentCount: post.CommentCount,

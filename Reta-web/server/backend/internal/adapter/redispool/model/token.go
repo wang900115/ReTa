@@ -2,6 +2,8 @@ package model
 
 import (
 	entities "backend/internal/domain/entities"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type TokenClaims struct {
@@ -9,6 +11,8 @@ type TokenClaims struct {
 	Username string `json:"username"`
 	Fullname string `json:"full_name"`
 	Nickname string `json:"nick_name"`
+
+	jwt.RegisteredClaims `json:"registered_claims"`
 }
 
 func (tc TokenClaims) ToDomain() entities.TokenClaims {

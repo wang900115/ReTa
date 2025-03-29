@@ -11,13 +11,6 @@ type IUserRepository interface {
 	// 更新使用者
 	UpdateUser(entities.User) (entities.User, error)
 
-	// 創建該貼文下的留言
-	CreateComment(entities.User, entities.Post, entities.Comment) (entities.PostWithComment, error)
-	// 刪除該貼文下的留言
-	DeleteComment(entities.User, entities.Post, string) (entities.PostWithComment, error)
-	// 更新該貼文下的留言
-	UpdateComment(entities.User, entities.Post, string, string) (entities.PostWithComment, error)
-
 	// 列出該使用者的權限
 	ListAuthority(entities.User) ([]entities.Authority, error)
 	// 列出該使用者的朋友
@@ -62,7 +55,7 @@ type IUserWithPostRepository interface {
 	// 新增貼文
 	CreatePost(entities.UserWithPost, entities.Post) (entities.UserWithPost, error)
 	// 刪除貼文
-	DeletePost(entities.UserWithPost, entities.Post) (entities.UserWithPost, error)
+	DeletePost(entities.UserWithPost, string) (entities.UserWithPost, error)
 	// 更新貼文
-	UpdatePost(entities.UserWithPost, entities.Post) (entities.UserWithPost, error)
+	UpdatePost(entities.UserWithPost, string, string, []string) (entities.UserWithPost, error)
 }

@@ -12,7 +12,6 @@ type UserRepository struct {
 	gorm *gorm.DB
 }
 
-// ! build 留言
 func NewUserRepository(gorm *gorm.DB) irepository.IUserRepository {
 	return &UserRepository{gorm: gorm}
 }
@@ -43,14 +42,6 @@ func (u *UserRepository) UpdateUser(user entities.User) (entities.User, error) {
 	}
 	updatedUser := userModel.ToDomain()
 	return updatedUser, nil
-}
-
-func (u *UserRepository) UpdatePassword(user entities.User, hashedPassword string) error {
-	userModel := model.User{}.FromDomain(user)
-	if err := u.gorm.Model(&userModel).Update("password", hashedPassword).Error; err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *UserRepository) ListAuthority(user entities.User) ([]entities.Authority, error) {
@@ -101,6 +92,14 @@ func (u *UserRepository) ListPost(user entities.User) ([]entities.Post, error) {
 		posts = append(posts, postModel.ToDomain())
 	}
 	return posts, nil
+}
+
+func (u *UserRepository) UpdatePassword(user entities.User, hashedPassword string) error {
+	userModel := model.User{}.FromDomain(user)
+	if err := u.gorm.Model(&userModel).Update("password", hashedPassword).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 type UserAuthorityRepository struct {
@@ -534,4 +533,139 @@ func (uc *UserChannelRepository) QuitChannel(userwithChannel entities.UserWithCh
 	}
 
 	return userChannel.ToDomain(), nil
+}
+
+type UserPostRepository struct {
+	gorm *gorm.DB
+}
+
+func NewUserPostRepository(gorm *gorm.DB) irepository.IUserWithPostRepository {
+	return &UserPostRepository{gorm: gorm}
+}
+
+func (up *UserPostRepository) CreatePost(userwithPost entities.UserWithPost, post entities.Post) (entities.UserWithPost, error) {
+	var userModel model.User
+	if err := up.gorm.First(&userModel, "uuid = ?", userwithPost.UUID).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+	// ! error
+	postModel := model.Post{}.FromDomain(post)
+	if err := up.gorm.Create(&postModel).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+
+	tx := up.gorm.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Model(&userModel).Association("Posts").Append(&postModel); err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	var postsModel []model.Post
+	if err := tx.Table("user_post").Joins("JOIN post ON post.UUID = user_post.post_uuid").Where("user_post.user_uuid = ?", userwithPost.UUID).Find(&postsModel).Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	userPost := model.UserWithPost{
+		User:  userModel,
+		Posts: postsModel,
+	}
+
+	return userPost.ToDomain(), nil
+}
+
+func (up *UserPostRepository) DeletePost(userwithPost entities.UserWithPost, uuid string) (entities.UserWithPost, error) {
+	var userModel model.User
+	if err := up.gorm.First(&userModel, "uuid = ?", userwithPost.UUID).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+	var postModel model.Post
+	if err := up.gorm.First(&postModel, "uuid = ?", uuid).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+
+	tx := up.gorm.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	if err := tx.Model(&userModel).Association("Posts").Delete(&postModel); err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	var postsModel []model.Post
+	if err := tx.Table("user_post").Joins("JOIN post ON post.UUID = user_post.post_uuid").Where("user_post.user_uuid = ?", userwithPost.UUID).Find(&postsModel).Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	userPost := model.UserWithPost{
+		User:  userModel,
+		Posts: postsModel,
+	}
+
+	return userPost.ToDomain(), nil
+}
+
+func (up *UserPostRepository) UpdatePost(userwithPost entities.UserWithPost, uuid string, msg string, url []string) (entities.UserWithPost, error) {
+	var userModel model.User
+	if err := up.gorm.First(&userModel, "uuid = ?", userwithPost.UUID).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+	var postModel model.Post
+	if err := up.gorm.First(&postModel, "uuid = ?", uuid).Error; err != nil {
+		return entities.UserWithPost{}, err
+	}
+
+	tx := up.gorm.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	postModel.Content = msg
+	postModel.MediaURL = url
+
+	if err := tx.Save(&postModel).Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	var postsModel []model.Post
+	if err := tx.Table("user_post").Joins("JOIN post ON post.UUID = user_post.post_uuid").Where("user_post.user_uuid = ?", userwithPost.UUID).Find(&postsModel).Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return entities.UserWithPost{}, err
+	}
+
+	userPost := model.UserWithPost{
+		User:  userModel,
+		Posts: postsModel,
+	}
+
+	return userPost.ToDomain(), nil
 }

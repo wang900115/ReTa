@@ -1,4 +1,4 @@
-package usercase
+package usecase
 
 import (
 	"backend/internal/domain/entities"
@@ -23,18 +23,6 @@ func (uu *UserUsecase) DeleteUser(wantDeleteUser entities.User) (entities.User, 
 
 func (uu *UserUsecase) UpdateUser(wantUpdateUser entities.User) (entities.User, error) {
 	return uu.userRepo.UpdateUser(wantUpdateUser)
-}
-
-func (uu *UserUsecase) CreateComment(wantCreateCommentUser entities.User, beAddedPost entities.Post, addedComment entities.Comment) (entities.PostWithComment, error) {
-	return uu.userRepo.CreateComment(wantCreateCommentUser, beAddedPost, addedComment)
-}
-
-func (uu *UserUsecase) DeleteComment(wantDeleteCommentUser entities.User, beDeletedPost entities.Post, UUID string) (entities.PostWithComment, error) {
-	return uu.userRepo.DeleteComment(wantDeleteCommentUser, beDeletedPost, UUID)
-}
-
-func (uu *UserUsecase) UpdateComment(wantUpdateCommentUser entities.User, beUpdatedPost entities.Post, UUID string, MSG string) (entities.PostWithComment, error) {
-	return uu.userRepo.UpdateComment(wantUpdateCommentUser, beUpdatedPost, UUID, MSG)
 }
 
 func (uu *UserUsecase) UpdatePassword(wantUpdatePasswordUser entities.User, newPassword string) error {
